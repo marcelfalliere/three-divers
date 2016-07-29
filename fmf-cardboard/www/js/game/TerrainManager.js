@@ -54,7 +54,7 @@ THREE.TerrainManager = function ( camera, scene ) {
     self.filer.init({persistent: true, size: ((TERRAIN_SEGMENTS+1)*(TERRAIN_SEGMENTS+1))*8 }, function(fs) {
       self.filer.ls('.', function(entries){
 
-        if (1==1) { //_.find(entries, function(e) { return e.name=="perlinData.dat" }) == undefined) {
+        if (_.find(entries, function(e) { return e.name=="perlinData.dat" }) == undefined) {
 
           debug("TerrainManager # generating data");
           var data = generateHeight(TERRAIN_SEGMENTS+1,TERRAIN_SEGMENTS+1)
