@@ -13,6 +13,8 @@ THREE.TerrainTile = function ( perlinData, nbTiles, size, segments, terrainColor
 
 	THREE.Mesh.call( this, geometry, material );
 
+	this.geometry.computeVertexNormals();
+
 	var vertices = geometry.attributes.position.array;
 
 	for ( var iPerlin = ( ((segments*nbTiles)+1)*position.x*segments ) + position.y*segments, // index du début des données qui nous intéressent pour ce tile dans perlinData

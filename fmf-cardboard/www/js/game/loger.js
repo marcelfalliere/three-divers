@@ -1,5 +1,5 @@
 
-var on_debug = false
+var on_debug = true
     on_perf = true
 
 if (on_debug) var debug = console.log.bind(window.console)

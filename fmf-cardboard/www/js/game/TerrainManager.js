@@ -3,16 +3,18 @@
  */
 
 
-var TILE_SIZE = 512,
+var TILE_SIZE = 1024,
     TILE_SEGMENTS = 130,
 
-    GRID_SIZE = 3,
+    GRID_SIZE = 20,
 
     TERRAIN_SEGMENTS = TILE_SEGMENTS*GRID_SIZE,
     TERRAIN_SIZE = TILE_SIZE*GRID_SIZE;
 
 
 THREE.TerrainManager = function ( camera, scene ) {
+
+  this.previousPositon = { x:NaN, y:NaN }
 
   this.perlinData;
 
@@ -31,15 +33,70 @@ THREE.TerrainManager = function ( camera, scene ) {
   //   }
   // }
 
-  this.prepare = function(){
+  this.prepare = function(done){
 
-     this.perlinData = generateHeight(TERRAIN_SEGMENTS+1,TERRAIN_SEGMENTS+1)
-    //  this.perlinData = JSON.parse(localStorage.getItem('perlinData'));
-    //  localStorage.setItem('perlinData', JSON.stringify(this.perlinData));
+    this.filer = new Filer();
+    var self = this; // sugarrr
 
-     var max = arrayMax(this.perlinData)
-     var min = arrayMin(this.perlinData)
-     this.waterLevel = (max + min) / 4
+    var handlePerlinData = function(self, perlinData) {
+      self.perlinData = perlinData;
+
+      var max = arrayMax(self.perlinData)
+      var min = arrayMin(self.perlinData)
+      self.waterLevel = (max + min) / 6
+      self.camera.position.x = TILE_SIZE / 2
+      self.camera.position.y = 500
+      self.camera.position.z = TILE_SIZE / 2
+
+      if (done) done()
+    }
+
+    self.filer.init({persistent: true, size: ((TERRAIN_SEGMENTS+1)*(TERRAIN_SEGMENTS+1))*8 }, function(fs) {
+      self.filer.ls('.', function(entries){
+
+        if (1==1) { //_.find(entries, function(e) { return e.name=="perlinData.dat" }) == undefined) {
+
+          debug("TerrainManager # generating data");
+          var data = generateHeight(TERRAIN_SEGMENTS+1,TERRAIN_SEGMENTS+1)
+          handlePerlinData(self, data);
+          debug("TerrainManager # data generated");
+
+          self.filer.write("perlinData.dat", {
+            type: 'text/plain',
+            data: self.perlinData.toString()
+          },
+            function(fileEntry, fileWriter) {
+              debug("TerrainManager # perlinData.dat written");
+            }, function onError(e) {
+              debug("TerrainManager # filter.write file error", e);
+            }
+          );
+
+        } else {
+
+          debug("TerrainManager # reading data file");
+
+          self.filer.open("perlinData.dat", function(file) {
+            // Use FileReader to read file.
+            var reader = new FileReader();
+            reader.onload = function(e) {
+              var data = new Uint8Array(e.target.result.toString().split(",").map(function(e){ return parseInt(e) }))
+              handlePerlinData(self, data)
+            }
+            reader.readAsText(file);
+          }, function onError(e) {
+            debug("TerrainManager # filter.open (.dat exists) error ", e);
+          });
+
+        }
+
+
+      }, function onError(e) {
+        debug("TerrainManager # filter.ls error", e);
+      })
+    }, function onError(e) {
+      debug("TerrainManager # filter.init error", e);
+    });
   }
 
   this.update = function(){
@@ -47,20 +104,25 @@ THREE.TerrainManager = function ( camera, scene ) {
     var posX = Math.floor(this.camera.position.z / TILE_SIZE),
         posY = Math.floor(this.camera.position.x / TILE_SIZE);
 
-    for (var i = 0 ; i < GRID_SIZE ; i++) {
-      for (var j = 0 ; j < GRID_SIZE ; j++) {
+    if (posX != this.previousPositon.x || posY != this.previousPositon.y) {
+      debug("treating new position, ", posX, posY)
+      this.previousPositon.x = posX;
+      this.previousPositon.y = posY;
+      for (var i = 0 ; i < GRID_SIZE ; i++) {
+        for (var j = 0 ; j < GRID_SIZE ; j++) {
 
-        if ( [posX-1, posX, posX+1].indexOf(i) != -1
+          if ( [posX-1, posX, posX+1].indexOf(i) != -1
           && [posY-1, posY, posY+1].indexOf(j) != -1) {
 
-          if (!(this.tiles[i][j] instanceof THREE.TerrainTile)) {
-            this.tiles[i][j] = new THREE.TerrainTile(this.perlinData, GRID_SIZE, TILE_SIZE, TILE_SEGMENTS, terrainColor, {x:i, y:j}, this.waterLevel );
-            this.scene.add(this.tiles[i][j])
-          }
-        } else if (this.tiles[i][j] instanceof THREE.TerrainTile) {
+            if (!(this.tiles[i][j] instanceof THREE.TerrainTile)) {
+              this.tiles[i][j] = new THREE.TerrainTile(this.perlinData, GRID_SIZE, TILE_SIZE, TILE_SEGMENTS, terrainColor, {x:i, y:j}, this.waterLevel );
+              this.scene.add(this.tiles[i][j])
+            }
+          } else if (this.tiles[i][j] instanceof THREE.TerrainTile) {
 
-          this.scene.remove(this.tiles[i][j])
-          this.tiles[i][j] = null
+            this.scene.remove(this.tiles[i][j])
+            this.tiles[i][j] = null
+          }
         }
       }
     }

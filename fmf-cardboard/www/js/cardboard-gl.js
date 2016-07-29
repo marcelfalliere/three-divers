@@ -9,6 +9,7 @@ var scene,
     wsGamepadControls,
     clock,
     stats,
+    pointLight,
 
     // mesh
     terrainManager,
@@ -51,17 +52,14 @@ angular.module('fmfcardboard-app')
 
     container = glFrame
 
-    init();
-    animate();
+    init(function(){
+      animate();
+    });
 
-    function init() {
+    function init(done) {
 
       // Camera
       camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
-      camera.position.x = - 20;
-      camera.position.y = 8;
-      camera.position.z = -2;
-      camera.lookAt(new THREE.Vector3(0,0,0))
 
       // Controls
       controls = new THREE.FirstPersonControls(camera);
@@ -82,7 +80,7 @@ angular.module('fmfcardboard-app')
       // Terrain
 
       terrainManager = new THREE.TerrainManager(camera, scene)
-      terrainManager.prepare();
+      terrainManager.prepare(function(){
 
       // // Update après les rotations etc..
       // debug(yMin, yMax)
@@ -147,13 +145,18 @@ angular.module('fmfcardboard-app')
     	hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
     	hemiLight.position.set( 0, 500, 0 );
     	scene.add( hemiLight );
+      //
+    	// dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+    	// // dirLight.color.setHSL( 0.5, 0.5, 0.5 );
+    	// dirLight.position.set( 0,10500,0 );
+    	// dirLight.position.multiplyScalar( 1 );
+    	// scene.add( dirLight );
+    	// dirLight.castShadow = true;
 
-    	dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
-    	// dirLight.color.setHSL( 0.5, 0.5, 0.5 );
-    	dirLight.position.set( 0,10500,0 );
-    	dirLight.position.multiplyScalar( 1 );
-    	scene.add( dirLight );
-    	dirLight.castShadow = true;
+      // Pointlight
+			pointLight = new THREE.PointLight( 0xff4400, 1.5 );
+			pointLight.position.set(camera.position.x, terrainManager.waterLevel + 50, camera.position.z );
+			scene.add( pointLight );
 
       // Renderer
       renderer = new THREE.WebGLRenderer();
@@ -181,6 +184,10 @@ angular.module('fmfcardboard-app')
 
       // Listener
       window.addEventListener('resize', resize, false);
+
+      if (done) done()
+
+      });
 
     }
 
