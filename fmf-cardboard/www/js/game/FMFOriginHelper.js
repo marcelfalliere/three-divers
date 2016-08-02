@@ -4,7 +4,7 @@
  * @author marcelfalliere
  */
 
-THREE.OriginHelper = function ( size ) {
+THREE.FMFOriginHelper = function ( size ) {
 
 	size = size || 1;
 
@@ -30,5 +30,5 @@ THREE.OriginHelper = function ( size ) {
 
 };
 
-THREE.OriginHelper.prototype = Object.create( THREE.LineSegments.prototype );
-THREE.OriginHelper.prototype.constructor = THREE.OriginHelper;
+THREE.FMFOriginHelper.prototype = Object.create( THREE.LineSegments.prototype );
+THREE.FMFOriginHelper.prototype.constructor = THREE.FMFOriginHelper;

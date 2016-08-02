@@ -4,15 +4,15 @@
 
 
 var TILE_SIZE = 1024,
-    TILE_SEGMENTS = 130,
+    TILE_SEGMENTS = 230,
 
-    GRID_SIZE = 20,
+    GRID_SIZE = 3,
 
     TERRAIN_SEGMENTS = TILE_SEGMENTS*GRID_SIZE,
     TERRAIN_SIZE = TILE_SIZE*GRID_SIZE;
 
 
-THREE.TerrainManager = function ( camera, scene ) {
+THREE.FMFTerrainManager = function ( camera, scene ) {
 
   this.previousPositon = { x:NaN, y:NaN }
 
@@ -45,7 +45,7 @@ THREE.TerrainManager = function ( camera, scene ) {
       var min = arrayMin(self.perlinData)
       self.waterLevel = (max + min) / 6
       self.camera.position.x = TILE_SIZE / 2
-      self.camera.position.y = 500
+      self.camera.position.y = self.waterLevel + 30
       self.camera.position.z = TILE_SIZE / 2
 
       if (done) done()
@@ -56,25 +56,25 @@ THREE.TerrainManager = function ( camera, scene ) {
 
         if (_.find(entries, function(e) { return e.name=="perlinData.dat" }) == undefined) {
 
-          debug("TerrainManager # generating data");
+          debug("FMFTerrainManager # generating data");
           var data = generateHeight(TERRAIN_SEGMENTS+1,TERRAIN_SEGMENTS+1)
           handlePerlinData(self, data);
-          debug("TerrainManager # data generated");
+          debug("FMFTerrainManager # data generated");
 
           self.filer.write("perlinData.dat", {
             type: 'text/plain',
             data: self.perlinData.toString()
           },
             function(fileEntry, fileWriter) {
-              debug("TerrainManager # perlinData.dat written");
+              debug("FMFTerrainManager # perlinData.dat written");
             }, function onError(e) {
-              debug("TerrainManager # filter.write file error", e);
+              debug("FMFTerrainManager # filter.write file error", e);
             }
           );
 
         } else {
 
-          debug("TerrainManager # reading data file");
+          debug("FMFTerrainManager # reading data file");
 
           self.filer.open("perlinData.dat", function(file) {
             // Use FileReader to read file.
@@ -85,17 +85,17 @@ THREE.TerrainManager = function ( camera, scene ) {
             }
             reader.readAsText(file);
           }, function onError(e) {
-            debug("TerrainManager # filter.open (.dat exists) error ", e);
+            debug("FMFTerrainManager # filter.open (.dat exists) error ", e);
           });
 
         }
 
 
       }, function onError(e) {
-        debug("TerrainManager # filter.ls error", e);
+        debug("FMFTerrainManager # filter.ls error", e);
       })
     }, function onError(e) {
-      debug("TerrainManager # filter.init error", e);
+      debug("FMFTerrainManager # filter.init error", e);
     });
   }
 
@@ -114,11 +114,11 @@ THREE.TerrainManager = function ( camera, scene ) {
           if ( [posX-1, posX, posX+1].indexOf(i) != -1
           && [posY-1, posY, posY+1].indexOf(j) != -1) {
 
-            if (!(this.tiles[i][j] instanceof THREE.TerrainTile)) {
-              this.tiles[i][j] = new THREE.TerrainTile(this.perlinData, GRID_SIZE, TILE_SIZE, TILE_SEGMENTS, terrainColor, {x:i, y:j}, this.waterLevel );
+            if (!(this.tiles[i][j] instanceof THREE.FMFTerrainTile)) {
+              this.tiles[i][j] = new THREE.FMFTerrainTile(this.perlinData, GRID_SIZE, TILE_SIZE, TILE_SEGMENTS, terrainColor, {x:i, y:j}, this.waterLevel );
               this.scene.add(this.tiles[i][j])
             }
-          } else if (this.tiles[i][j] instanceof THREE.TerrainTile) {
+          } else if (this.tiles[i][j] instanceof THREE.FMFTerrainTile) {
 
             this.scene.remove(this.tiles[i][j])
             this.tiles[i][j] = null
@@ -160,4 +160,4 @@ THREE.TerrainManager = function ( camera, scene ) {
 
 };
 
-THREE.TerrainManager.prototype.constructor = THREE.TerrainManager;
+THREE.FMFTerrainManager.prototype.constructor = THREE.FMFTerrainManager;

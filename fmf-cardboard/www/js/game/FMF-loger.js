@@ -1,6 +1,6 @@
 
-var on_debug = true
-    on_perf = true
+var on_debug = false
+    on_perf = false
 
 if (on_debug) var debug = console.log.bind(window.console)
 else var debug = function(){}

@@ -2,14 +2,14 @@
  * @author marcelfalliere
  */
 
-THREE.TerrainTile = function ( perlinData, nbTiles, size, segments, terrainColor, position, waterLevel ) {
+THREE.FMFTerrainTile = function ( perlinData, nbTiles, size, segments, terrainColor, position, waterLevel ) {
 
-	debug("TerrainTile # perlinData.length->",perlinData.length," nbTiles->",nbTiles," size->",size," segments->",segments," terrainColor->",terrainColor," position->",position, " waterLevel->",waterLevel);
+	debug("FMFTerrainTile # perlinData.length->",perlinData.length," nbTiles->",nbTiles," size->",size," segments->",segments," terrainColor->",terrainColor," position->",position, " waterLevel->",waterLevel);
 
 	this.perlinData = perlinData;
 
 	var geometry = new THREE.PlaneBufferGeometry( size, size, parseInt(segments), parseInt(segments));
-	var material = new THREE.MeshLambertMaterial({color : terrainColor, wireframe:false });
+	var material = new THREE.MeshLambertMaterial({color : terrainColor, wireframe:on_debug });
 
 	THREE.Mesh.call( this, geometry, material );
 
@@ -42,9 +42,9 @@ THREE.TerrainTile = function ( perlinData, nbTiles, size, segments, terrainColor
 	 	}
 	}
 
-	debug("TerrainTile finalPosition", this.position)
+	debug("FMFTerrainTile finalPosition", this.position)
 
 };
 
-THREE.TerrainTile.prototype = Object.create( THREE.Mesh.prototype );
-THREE.TerrainTile.prototype.constructor = THREE.TerrainTile;
+THREE.FMFTerrainTile.prototype = Object.create( THREE.Mesh.prototype );
+THREE.FMFTerrainTile.prototype.constructor = THREE.FMFTerrainTile;

@@ -1,3 +1,4 @@
+var EPSILON = 0.00001;
 
 function arrayMin(arr) {
   var len = arr.length, min = Infinity;

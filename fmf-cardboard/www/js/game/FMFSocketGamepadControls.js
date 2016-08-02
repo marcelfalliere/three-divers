@@ -4,7 +4,7 @@
 
 var SOCKET_SERVER = "192.168.1.16"
 
-THREE.SocketGamepadControls = function ( camera ) {
+THREE.FMFSocketGamepadControls = function ( camera ) {
 
 	this.camera = camera;
 

@@ -25,6 +25,7 @@ var scene,
     terrainColor = 0x3E8F22,
     waterColor = 0x88BDCF,
     lightColor =  0x00ffff,
+    birdColor = 0xeab5ef,
 
     // fog
     fogDensity = 0.0000325,
@@ -61,26 +62,21 @@ angular.module('fmfcardboard-app')
       // Camera
       camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
 
-      // Controls
-      controls = new THREE.FirstPersonControls(camera);
-      controls.movementSpeed = 15000;
-      controls.lookSpeed = 10;
-      controls.mouseDragOn = true;
-      // Orbit controls...
-      // controls = new THREE.OrbitControls(camera);
-      // controls.target = new THREE.Vector3(0,0,0);
-      // controls.enableDamping = true;
-			// controls.dampingFactor = 0.25;
-			// controls.enableZoom = true;
-
       // Scene and Fog
       scene = new THREE.Scene();
       scene.fog = new THREE.FogExp2(fogColor, fogDensity);
 
-      // Terrain
 
-      terrainManager = new THREE.TerrainManager(camera, scene)
+      // Terrain Manager <-- Terrain Tile
+      terrainManager = new THREE.FMFTerrainManager(camera, scene)
       terrainManager.prepare(function(){
+
+      // Controls
+      controls = new THREE.FMFControls(camera, scene, birdColor);
+      // Camera initial position // TODO : ray cast at this position and add some y's
+      controls.initAtPosition(TILE_SIZE/2, terrainManager.waterLevel + 30, TILE_SIZE/2)
+
+      // Water Manager ... TODO
 
       // // Update après les rotations etc..
       // debug(yMin, yMax)
@@ -179,7 +175,7 @@ angular.module('fmfcardboard-app')
 			// scene.add( helper );
 
       // Arrow Helpers
-      var axisHelper = new THREE.OriginHelper( TERRAIN_SIZE / TERRAIN_SEGMENTS );
+      var axisHelper = new THREE.FMFOriginHelper( TERRAIN_SIZE / TERRAIN_SEGMENTS );
       scene.add(axisHelper);
 
       // Listener
@@ -229,7 +225,7 @@ angular.module('fmfcardboard-app')
 
       stats.update();
 
-      controls.update(clock.getDelta());
+      controls.update(clock.getDelta(), clock.getElapsedTime());
       // wsGamepadControls.update(dt);
 
       terrainManager.update();
