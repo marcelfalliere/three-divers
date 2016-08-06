@@ -8,6 +8,7 @@ THREE.FMFPlayer = function ( controls, camera, birdColor ) {
 	debug("FMFPlayer # init");
 
   this.camera = camera;
+
   this.controls = controls;
 
   this.bodyParts = {
@@ -33,6 +34,8 @@ THREE.FMFPlayer = function ( controls, camera, birdColor ) {
       material = new THREE.MeshLambertMaterial({color : this.birdColor, wireframe:on_debug, side:THREE.DoubleSide });
 
   this.mesh = new THREE.Object3D();
+
+	this.position = this.mesh.position;
 
   // Head setup
   head_geometry.applyMatrix( new THREE.Matrix4().makeScale( 2.0, 1.0, 1.0 ) );

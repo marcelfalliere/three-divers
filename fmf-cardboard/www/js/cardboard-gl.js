@@ -20,7 +20,9 @@ var scene,
 
     // colors
     // fogColor = 0xeab5ef,
-    fogColor = 0x000000,
+    clearColor = 0x1E1E43,
+    fogColor = 0x462666,
+    // fogColor = 0x000000,
     skyColor = 0xeab5ef,
     terrainColor = 0x3E8F22,
     waterColor = 0x88BDCF,
@@ -28,10 +30,10 @@ var scene,
     birdColor = 0xeab5ef,
 
     // fog
-    fogDensity = 0.0000325,
+    fogDensity = 0.000925,
 
-    // water
-    waterLevel = 0,
+    // stars
+    starsGroup,
 
     // gui
     foo='bar';
@@ -74,7 +76,7 @@ angular.module('fmfcardboard-app')
       // Controls
       controls = new THREE.FMFControls(camera, scene, birdColor);
       // Camera initial position // TODO : ray cast at this position and add some y's
-      controls.initAtPosition(TILE_SIZE/2, terrainManager.waterLevel + 30, TILE_SIZE/2)
+      controls.initAtPosition(Math.round((TILE_SIZE*GRID_SIZE)/2), terrainManager.waterLevel + 130, Math.round((TILE_SIZE*GRID_SIZE)/2))
 
       // Water Manager ... TODO
 
@@ -149,6 +151,44 @@ angular.module('fmfcardboard-app')
     	// scene.add( dirLight );
     	// dirLight.castShadow = true;
 
+      // Stars
+      starsGroup = new THREE.Group();
+      var texLoader = new THREE.TextureLoader();
+			map = texLoader.load( 'resources/star-32.png' );
+      var star_target = controls.bird;
+
+      starsGroup.position.x = controls.bird.position.x - STARS_SIZE/2;
+      starsGroup.position.z = controls.bird.position.z - STARS_SIZE/2;
+      scene.add(starsGroup);
+
+      var birdPos = new THREE.Vector2(star_target.position.x, star_target.position.z);
+
+      for (var i = 0 ; i < STARS_COUNT ; i++) {
+
+        var material = new THREE.SpriteMaterial( {
+          color: 0xFFFFFF,
+          map: map,
+          fog:true
+        } );
+
+        particle = new THREE.Sprite( material );
+        particle.position.x = Math.random() * STARS_SIZE;
+        particle.position.z = Math.random() * STARS_SIZE;
+
+
+        var particlePos = new THREE.Vector2(particle.position.x, particle.position.z);
+        var distanceToBird = particlePos.distanceTo(birdPos);
+
+        // particle.position.y = terrainManager.waterLevel + 400
+        // particle.position.y = terrainManager.waterLevel + 800 - distanceToBird;
+        particle.position.y = Math.max(terrainManager.waterLevel,terrainManager.waterLevel + STARS_SIZE/2 - distanceToBird )
+
+        particle.scale.x = particle.scale.y = Math.random() * (STARS_SIZE/2 - distanceToBird) * 0.008;
+
+        starsGroup.add( particle );
+
+      }
+
       // Pointlight
 			pointLight = new THREE.PointLight( 0xff4400, 1.5 );
 			pointLight.position.set(camera.position.x, terrainManager.waterLevel + 50, camera.position.z );
@@ -156,7 +196,7 @@ angular.module('fmfcardboard-app')
 
       // Renderer
       renderer = new THREE.WebGLRenderer();
-      renderer.setClearColor(fogColor);
+      renderer.setClearColor(clearColor);
       renderer.setPixelRatio(window.devicePixelRatio);
       renderer.setSize(window.innerWidth, window.innerHeight);
       container.innerHTML = "";
