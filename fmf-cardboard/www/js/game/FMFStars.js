@@ -1,3 +1,0 @@
-
-var STARS_SIZE = 3000,
-    STARS_COUNT = 10000;

@@ -26,43 +26,43 @@ THREE.FMFPlayer = function ( controls, camera, birdColor ) {
   // Light
   this.pointLight = new THREE.PointLight( 0xff4400, 1.5 );
 
-  // Bird is composed of :
-  var body_geometry = new THREE.SphereGeometry( 5, 16, 12 ),
-      head_geometry = new THREE.SphereGeometry( 3, 16, 12 ),
-      wingR_geometry = new THREE.CircleBufferGeometry( 3, 32, 0, Math.PI ),
-      wingL_geometry = new THREE.CircleBufferGeometry( 3, 32, 0, Math.PI ), // and ....
-      material = new THREE.MeshLambertMaterial({color : this.birdColor, wireframe:on_debug, side:THREE.DoubleSide });
-
-  this.mesh = new THREE.Object3D();
-
+	this.mesh = new THREE.Object3D();
 	this.position = this.mesh.position;
 
+  // Bird is composed of :
+  var body_geometry = new THREE.SphereGeometry( 3, 30, 25 ),
+      // head_geometry = new THREE.SphereGeometry( 3, 16, 12 ),
+      // wingR_geometry = new THREE.CircleBufferGeometry( 3, 32, 0, Math.PI ),
+      // wingL_geometry = new THREE.CircleBufferGeometry( 3, 32, 0, Math.PI ), // and ....
+      material = new THREE.MeshLambertMaterial({color : this.birdColor, wireframe:on_debug, side:THREE.DoubleSide });
+
+
   // Head setup
-  head_geometry.applyMatrix( new THREE.Matrix4().makeScale( 2.0, 1.0, 1.0 ) );
-  this.bodyParts.head = new THREE.Mesh(head_geometry, material)
-  this.bodyParts.head.rotation.z = Math.PI/8;
-  this.bodyParts.head.position.x = -4;
-  this.bodyParts.head.position.y = 5;
-  this.mesh.add(this.bodyParts.head);
+  // head_geometry.applyMatrix( new THREE.Matrix4().makeScale(.3,.3,.3) );
+  // this.bodyParts.head = new THREE.Mesh(head_geometry, material)
+  // this.bodyParts.head.rotation.z = Math.PI/8;
+  // this.bodyParts.head.position.x = -4;
+  // this.bodyParts.head.position.y = 5;
+  // this.mesh.add(this.bodyParts.head);
 
   // Body setup
-  body_geometry.applyMatrix( new THREE.Matrix4().makeScale( 1.0, 0.8, 1.5 ) );
+  body_geometry.applyMatrix( new THREE.Matrix4().makeScale( 1.0, 1.0, 1.0 ) );
   this.bodyParts.body = new THREE.Mesh(body_geometry, material);
   this.bodyParts.body.rotation.y = Math.PI/2;
   this.bodyParts.body.position.y = 0;
   this.mesh.add(this.bodyParts.body);
 
   // Right Wing setup
-  wingR_geometry.applyMatrix( new THREE.Matrix4().makeScale(1.8,5.0,1.0));
-  this.bodyParts.wings.right = new THREE.Mesh( wingR_geometry, material );
-  this.bodyParts.wings.right.rotation.x = -Math.PI/2
-  this.mesh.add(this.bodyParts.wings.right);
-
-  // Left Wing setup
-  wingL_geometry.applyMatrix( new THREE.Matrix4().makeScale(1.8,5.0,1.0));
-  this.bodyParts.wings.left = new THREE.Mesh( wingL_geometry, material );
-  this.bodyParts.wings.left.rotation.x = Math.PI/2
-  this.mesh.add(this.bodyParts.wings.left);
+  // wingR_geometry.applyMatrix( new THREE.Matrix4().makeScale(1.8,5.0,1.0));
+  // this.bodyParts.wings.right = new THREE.Mesh( wingR_geometry, material );
+  // this.bodyParts.wings.right.rotation.x = -Math.PI/2
+  // this.mesh.add(this.bodyParts.wings.right);
+	//
+  // // Left Wing setup
+  // wingL_geometry.applyMatrix( new THREE.Matrix4().makeScale(1.8,5.0,1.0));
+  // this.bodyParts.wings.left = new THREE.Mesh( wingL_geometry, material );
+  // this.bodyParts.wings.left.rotation.x = Math.PI/2
+  // this.mesh.add(this.bodyParts.wings.left);
 
 
 

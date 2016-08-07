@@ -84,7 +84,6 @@ THREE.FMFControls = function ( camera, scene, birdColor ) {
       if (this.phi > Math.PI) {
         this.phi = Math.PI;
       }
-      console.log(this.phi, Math.PI)
     }
 
     this.camera.position.x = this.bird.mesh.position.x + this.radius * Math.cos(this.teta);
