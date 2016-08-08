@@ -45,9 +45,58 @@
     <script src="js/game/FMFStarsManager.js"></script>
     <script src="js/game/FMFWaterManager.js"></script>
 
+
     <script src="js/game/FMFSocketGamepadControls.js"></script>
     <script src="js/game/FMFControls.js"></script>
     <script src="js/game/FMFPlayer.js"></script>
+
+    <script id="bird-fragmentShader" type="x-shader/x-fragment">
+
+			uniform float time;
+			uniform vec2 resolution;
+
+			varying vec2 vUv;
+      varying float x;
+      varying float y;
+
+			void main( void ) {
+
+				vec2 position = -1.0 + 2.0 * vUv;
+
+        // float red   = abs( sin( x * y + time * 0.3 ) );
+        // float green = abs( sin( x * y + time * 1.0 ) );
+        // float blue  = abs( sin( x * y + time * 1.5 ) );
+        // gl_FragColor = vec4( red, green, blue, 0.5 );
+
+        float color = 0.0;
+				color += sin( x * cos( time / 15.0 ) * 80.0 ) + cos( y * cos( time / 15.0 ) * 10.0 );
+				color += sin( y * sin( time / 10.0 ) * 40.0 ) + cos( x * sin( time / 25.0 ) * 40.0 );
+				color += sin( x * sin( time / 5.0 ) * 10.0 ) + sin( y * sin( time / 35.0 ) * 80.0 );
+				color *= sin( time / 10.0 ) * 0.5;
+        gl_FragColor = vec4( vec3( color, color * 0.5, sin( color + time / 3.0 ) * 0.75 ), 1.0 );
+
+
+			}
+
+		</script>
+
+		<script id="default-vertexShader" type="x-shader/x-vertex">
+
+			varying vec2 vUv;
+      varying float x;
+      varying float y;
+
+			void main()
+			{
+        gl_Position = projectionMatrix *
+                modelViewMatrix *
+                vec4(position,1.0);
+        x = position.x;
+        y = position.y;
+			}
+
+		</script>
+
 
     <!-- app controllers -->
     <script src="js/app.js"></script>
@@ -78,27 +127,6 @@
         </ion-content>
       </ion-modal-view>
     </script>
-
-    <script type="x-shader/x-vertex" id="vertexShader">
-			varying vec3 vWorldPosition;
-			void main() {
-				vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
-				vWorldPosition = worldPosition.xyz;
-				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-			}
-		</script>
-
-		<script type="x-shader/x-fragment" id="fragmentShader">
-			uniform vec3 topColor;
-			uniform vec3 bottomColor;
-			uniform float offset;
-			uniform float exponent;
-			varying vec3 vWorldPosition;
-			void main() {
-				float h = normalize( vWorldPosition + offset ).y;
-				gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
-			}
-		</script>
 
   </body>
 </html>
