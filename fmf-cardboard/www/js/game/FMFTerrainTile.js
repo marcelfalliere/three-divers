@@ -8,8 +8,15 @@ THREE.FMFTerrainTile = function ( perlinData, nbTiles, size, segments, terrainCo
 
 	this.perlinData = perlinData;
 
-	var geometry = new THREE.PlaneBufferGeometry( size, size, parseInt(segments), parseInt(segments));
-	var material = new THREE.MeshLambertMaterial({color : terrainColor, wireframe:on_debug });
+	var geometry = new THREE.PlaneBufferGeometry( size, size, parseInt(segments), parseInt(segments)),
+			material1 = new THREE.MeshLambertMaterial({color : terrainColor, wireframe:on_debug }),
+			material2 = new THREE.ShaderMaterial({
+										uniforms: { waterLevel:{ value:waterLevel } },
+										vertexShader: document.getElementById( 'default-vertexShader' ).textContent,
+										fragmentShader: document.getElementById( 'terrain-fragmentShader' ).textContent
+									});
+
+	var material = material2;
 
 	THREE.Mesh.call( this, geometry, material );
 

@@ -33,6 +33,7 @@
     <script src="js/lib/FirstPersonControls.js"></script>
     <script src="js/lib/stats.min.js"></script>
     <script src="js/lib/dat.gui.min.js"></script>
+    <script src="js/lib/Mirror.js"></script>
 
 
     <!-- game files -->
@@ -45,10 +46,44 @@
     <script src="js/game/FMFStarsManager.js"></script>
     <script src="js/game/FMFWaterManager.js"></script>
 
-
     <script src="js/game/FMFSocketGamepadControls.js"></script>
     <script src="js/game/FMFControls.js"></script>
     <script src="js/game/FMFPlayer.js"></script>
+
+    <script id="terrain-fragmentShader" type="x-shader/x-fragment">
+
+      uniform float waterLevel;
+			varying vec2 vUv;
+      varying float x;
+      varying float y;
+
+			void main( void ) {
+
+				vec2 position = -1.0 + 2.0 * vUv;
+        float o = 1.0;
+        vec3 basecolor = vec3(22.0, 13.0, 14.0);
+
+        if ( y > waterLevel + o) {
+          float red   = 0.0; //y/2.0;
+          float green = y / 100.0;
+          float blue  = 1.0;
+
+          gl_FragColor = vec4( red, green, blue, 1.0 );
+        } else if ( y > waterLevel - o && y <= waterLevel + o) {
+          float red   = 255.0;
+          float green = 255.0;
+          float blue  = 250.0;
+          gl_FragColor = vec4( red, green, blue, 1.0 );
+        } else {
+          float red   = 0.0;
+          float green = 0.0;
+          float blue  = 0.0;
+          gl_FragColor = vec4( red, green, blue, 1.0 );
+        }
+
+			}
+
+		</script>
 
     <script id="bird-fragmentShader" type="x-shader/x-fragment">
 
@@ -92,7 +127,7 @@
                 modelViewMatrix *
                 vec4(position,1.0);
         x = position.x;
-        y = position.y;
+        y = position.z;
 			}
 
 		</script>

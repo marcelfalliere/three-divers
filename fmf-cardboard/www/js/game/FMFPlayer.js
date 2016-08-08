@@ -24,7 +24,7 @@ THREE.FMFPlayer = function ( controls, camera, birdColor ) {
 
 
   // Light
-  this.pointLight = new THREE.PointLight( 0xff4400, 1.5 );
+  this.pointLight = new THREE.PointLight( 0xFFFFFF, 0.5 );
 
 	// New body ! v2
 	var body_geometry = new THREE.SphereGeometry( 5, 30, 25 );
@@ -123,9 +123,6 @@ THREE.FMFPlayer = function ( controls, camera, birdColor ) {
 
 
       // this.mesh.rotation.y = 2*Math.PI - this.controls.teta
-
-      console.log(this.controls.phi)
-
 
     }
   }
