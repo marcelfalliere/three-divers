@@ -13,7 +13,7 @@ THREE.FMFControls = function ( camera, scene, birdColor ) {
   this.teta = 0; // dernier angle sur le cercle trigo de la camera autour du bird sur le plan x/z
   this.phi = Math.PI/2; // dernier angle sur Y
 
-  this.cameraSpeedHorizontal = 100;
+  this.cameraSpeedHorizontal = 50;
   this.cameraSpeedVertical = 100;
 
   // Button/Mouse states
@@ -61,36 +61,53 @@ THREE.FMFControls = function ( camera, scene, birdColor ) {
   }
 
   // Update
-  var super_update = this.update;
+  var toBack = false;
+	var raycaster = new THREE.Raycaster();
+	// Camera position update
+	var speedX = .5,
+			speedY = 0.1,
+			maxY = 200,
+			minY = this.camera.position.y + 5,
+			directionY = 1;
+
   this.update = function(delta, elapsedSeconds) {
 
     // Bird update
     this.bird.update(delta, elapsedSeconds, this.birdControls);
 
-    // Camera position update
-    if (this.cameraLeft && !this.cameraRight) {
-      this.teta += delta*this.cameraSpeedHorizontal;
-    } else if (!this.cameraLeft && this.cameraRight) {
-      this.teta += (delta*(-1))*this.cameraSpeedHorizontal;
-    }
+		var distanceToBird = this.camera.position.distanceTo(this.bird.position);
 
-    if (this.cameraUp && !this.cameraDown) {
-      this.phi += (delta*(-1))*this.cameraSpeedVertical;
-      if (this.phi < 0) {
-        this.phi = 0;
-      }
-    } else if (!this.cameraUp && this.cameraDown) {
-      this.phi += delta*this.cameraSpeedVertical;
-      if (this.phi > Math.PI) {
-        this.phi = Math.PI;
-      }
-    }
+		this.camera.translateX(speedX);
 
-    this.camera.position.x = this.bird.mesh.position.x + this.radius * Math.cos(this.teta);
-    this.camera.position.z = this.bird.mesh.position.z + this.radius * Math.sin(this.teta);
-    this.camera.position.y = this.bird.mesh.position.y + this.radius * Math.cos(this.phi);
-    this.camera.lookAt( this.bird.mesh.position );
+		if (this.camera.position.y <= minY) {
+			directionY = 1;
+		} else if (this.camera.position.y >= maxY) {
+			directionY = -1;
+		}
 
+		this.camera.translateY(speedY * directionY);
+		this.bird.mesh.translateY(speedY * directionY);
+
+		//
+		// if (toBack && distanceToBird <= this.bird.mesh.geometry.parameters.radius + 20) {
+		// 	toBack=false;
+		// }
+		//
+		// if (distanceToBird >= this.bird.mesh.geometry.parameters.radius && distanceToBird < maxDistance && !toBack ) {
+		// 	this.camera.translateZ(speed);
+		// } else {
+		// 	toBack = true;
+		// 	this.camera.translateZ(-speed);
+		// }
+		//
+		// raycaster.set(this.camera.position, new THREE.Vector3(0,-1,0));
+		// var intersects = raycaster.intersectObjects( scene.children );
+		// if(_.some(intersects, function(i) { i.distance < 10 })) {
+		// 	this.camera.translateY(20);
+		// 	consoe.log("yo")
+		// }
+
+    this.camera.lookAt( this.bird.position );
 
   }
 

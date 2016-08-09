@@ -26,7 +26,7 @@ var scene,
     // fogColor = 0x000000,
     skyColor = 0xeab5ef,
     terrainColor = 0x3E8F22,
-    waterColor = 0x88BDCF,
+    waterColor = 0xF58B67,
     lightColor =  0x00ffff,
     birdColor = 0xeab5ef,
 
@@ -75,7 +75,14 @@ angular.module('fmfcardboard-app')
       // Controls
       controls = new THREE.FMFControls(camera, scene, birdColor);
       // Camera initial position // TODO : ray cast at this position and add some y's
-      controls.initAtPosition(Math.round((TILE_SIZE*GRID_SIZE)/2), terrainManager.waterLevel + 130, Math.round((TILE_SIZE*GRID_SIZE)/2))
+      controls.initAtPosition(
+        // Math.round((TILE_SIZE*GRID_SIZE)/2),
+        // terrainManager.waterLevel + 130,
+        // Math.round((TILE_SIZE*GRID_SIZE)/2)
+        1876.9658717988589,
+        58.75332999365925,
+        1714.061042652928
+      )
 
       // Water Manager ... TODO
 
@@ -139,7 +146,7 @@ angular.module('fmfcardboard-app')
     	// scene.add( hemiLight );
 
       // Stars
-      starsManager = new THREE.FMFStarsManager(controls.bird);
+      starsManager = new THREE.FMFStarsManager(camera);
       starsManager.addToScene(scene)
 
       // Renderer
@@ -160,6 +167,24 @@ angular.module('fmfcardboard-app')
       // Arrow Helpers
       var axisHelper = new THREE.FMFOriginHelper( TERRAIN_SIZE / TERRAIN_SEGMENTS );
       scene.add(axisHelper);
+
+      // UI
+      var gui = new dat.GUI(),
+          GuiController = function(){
+              this.newPerlinData =  function(){
+                  terrainManager.deleteLocalFiles(function(code){
+                    if (code==0) {
+                      location.reload()
+                    } else {
+                      alert("Error! Check the console.")
+                    }
+                  });
+              }
+          },
+          guiController = new GuiController();
+
+			gui.add(guiController, "newPerlinData");
+
 
       // Listener
       window.addEventListener('resize', resize, false);

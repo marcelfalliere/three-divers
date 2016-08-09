@@ -56,7 +56,7 @@ THREE.FMFTerrainManager = function ( camera, scene ) {
 
         if (_.find(entries, function(e) { return e.name=="perlinData.dat" }) == undefined) {
 
-          debug("FMFTerrainManager # generating data");
+          info("FMFTerrainManager # generating data");
           var data = generateHeight(TERRAIN_SEGMENTS+1,TERRAIN_SEGMENTS+1)
           handlePerlinData(self, data);
           debug("FMFTerrainManager # data generated");
@@ -66,36 +66,37 @@ THREE.FMFTerrainManager = function ( camera, scene ) {
             data: self.perlinData.toString()
           },
             function(fileEntry, fileWriter) {
-              debug("FMFTerrainManager # perlinData.dat written");
+              info("FMFTerrainManager # perlinData.dat written");
             }, function onError(e) {
-              debug("FMFTerrainManager # filter.write file error", e);
+              error("FMFTerrainManager # filter.write file error", e);
             }
           );
 
         } else {
 
-          debug("FMFTerrainManager # reading data file");
+          info("FMFTerrainManager # reading data file...");
 
           self.filer.open("perlinData.dat", function(file) {
             // Use FileReader to read file.
             var reader = new FileReader();
             reader.onload = function(e) {
+              info("FMFTerrainManager # it is read !...");
               var data = new Uint8Array(e.target.result.toString().split(",").map(function(e){ return parseInt(e) }))
               handlePerlinData(self, data)
             }
             reader.readAsText(file);
           }, function onError(e) {
-            debug("FMFTerrainManager # filter.open (.dat exists) error ", e);
+            error("FMFTerrainManager # filter.open (.dat exists) error ", e);
           });
 
         }
 
 
       }, function onError(e) {
-        debug("FMFTerrainManager # filter.ls error", e);
+        error("FMFTerrainManager # filter.ls error", e);
       })
     }, function onError(e) {
-      debug("FMFTerrainManager # filter.init error", e);
+      error("FMFTerrainManager # filter.init error", e);
     });
   }
 
@@ -126,6 +127,42 @@ THREE.FMFTerrainManager = function ( camera, scene ) {
         }
       }
     }
+  }
+
+  this.deleteLocalFiles = function(done){
+
+    var self = this; // sugarrr
+
+    self.filer.init({persistent: true, size: ((TERRAIN_SEGMENTS+1)*(TERRAIN_SEGMENTS+1))*8 }, function(fs) {
+      self.filer.ls('.', function(entries){
+
+        if (_.find(entries, function(e) { return e.name.indexOf("perlinData.dat")!=-1 }) != undefined) {
+
+          info("FMFTerrainManager # going to delete perlinData.dat");
+
+          self.filer.rm("perlinData.dat",
+            function() {
+              info("FMFTerrainManager # perlinData.dat deleted!");
+              done(0);
+            }, function onError(e) {
+              error("FMFTerrainManager # filter.write file error", e);
+              done(3)
+            }
+          );
+
+        } else {
+          error("FMFTerrainManager # file not found", e);
+          done(4);
+        }
+      }, function onError(e) {
+        error("FMFTerrainManager # filter.ls error", e);
+        done(1);
+      })
+    }, function onError(e) {
+      error("FMFTerrainManager # filter.init error", e);
+      done(2);
+    });
+
   }
 
   this.getPerlinData = function(){

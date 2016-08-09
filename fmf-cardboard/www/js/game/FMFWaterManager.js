@@ -18,7 +18,10 @@ THREE.FMFWaterManager = function ( player, waterLevel ) {
   var geometry = new THREE.PlaneBufferGeometry(WATER_SIZE,WATER_SIZE, Math.round(WATER_SIZE/10), Math.round(WATER_SIZE/10) )
   var material = new THREE.MeshPhongMaterial({
     color:waterColor,
-    wireframe:false
+    wireframe:false,
+    fog:true,
+    emissive:waterColor,
+    emissiveIntensity:0.9
   })
   this.mesh = new THREE.Mesh(geometry, material)
   this.mesh.rotation.x = -Math.PI / 2;

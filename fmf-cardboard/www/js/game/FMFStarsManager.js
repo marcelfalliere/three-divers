@@ -6,7 +6,7 @@
 var STARS_SIZE = 3000,
     STARS_COUNT = 7000;
 
-THREE.FMFStarsManager = function ( player ) {
+THREE.FMFStarsManager = function ( target ) {
 
   this.group = new THREE.Group();
 
@@ -15,8 +15,7 @@ THREE.FMFStarsManager = function ( player ) {
   map = texLoader.load( 'resources/star-32.png' );
 
   // Target
-  var target = controls.bird,
-      target_pos = new THREE.Vector2(target.position.x, target.position.z);
+  var target_pos = new THREE.Vector2(target.position.x, target.position.z);
 
   // Group position
   this.group.position.x = target.position.x - STARS_SIZE/2;
