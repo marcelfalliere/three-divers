@@ -12,6 +12,7 @@
     <link href="css/ionic.app.css" rel="stylesheet">
     -->
 
+
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
     <script src="lib/ionic-platform-web-client/dist/ionic.io.bundle.min.js"></script>
@@ -22,6 +23,7 @@
     <!-- <script src="cordova.js"></script> -->
 
     <!-- Three.js -->
+    <script src="js/polyfill/filer.min.js"></script>
     <script src="js/lib/three.min.js"></script>
     <script src="js/lib/StereoEffect.js"></script>
     <script src="js/lib/DeviceOrientationControls.js"></script>
@@ -31,15 +33,185 @@
     <script src="js/lib/FirstPersonControls.js"></script>
     <script src="js/lib/stats.min.js"></script>
     <script src="js/lib/dat.gui.min.js"></script>
+    <script src="js/lib/Mirror.js"></script>
 
 
     <!-- game files -->
-    <script src="js/game/utils-js.js"></script>
-    <script src="js/game/loger.js"></script>
-    <script src="js/game/OriginHelper.js"></script>
-    <script src="js/game/SocketGamepadControls.js"></script>
-    <script src="js/game/TerrainTile.js"></script>
-    <script src="js/game/TerrainManager.js"></script>
+    <script src="js/game/FMF-utils-js.js"></script>
+    <script src="js/game/FMF-loger.js"></script>
+    <script src="js/game/FMFOriginHelper.js"></script>
+
+    <script src="js/game/FMFTerrainManager.js"></script>
+    <script src="js/game/FMFTerrainTile.js"></script>
+    <script src="js/game/FMFStarsManager.js"></script>
+    <script src="js/game/FMFWaterManager.js"></script>
+
+    <script src="js/game/FMFSocketGamepadControls.js"></script>
+    <script src="js/game/FMFControls.js"></script>
+    <script src="js/game/FMFPlayer.js"></script>
+
+    <script id="terrain-fragmentShader" type="x-shader/x-fragment">
+
+      uniform float waterLevel;
+			varying vec2 vUv;
+      varying float x;
+      varying float y;
+
+// COMMON
+#define PI 3.14159265359
+#define PI2 6.28318530718
+#define RECIPROCAL_PI 0.31830988618
+#define RECIPROCAL_PI2 0.15915494
+#define LOG2 1.442695
+#define EPSILON 1e-6
+#define saturate(a) clamp( a, 0.0, 1.0 )
+#define whiteCompliment(a) ( 1.0 - saturate( a ) )
+float pow2( const in float x ) { return x*x; }
+float pow3( const in float x ) { return x*x*x; }
+float pow4( const in float x ) { float x2 = x*x; return x2*x2; }
+float average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }
+highp float rand( const in vec2 uv ) {
+	const highp float a = 12.9898, b = 78.233, c = 43758.5453;
+	highp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );
+	return fract(sin(sn) * c);
+}
+struct IncidentLight {
+	vec3 color;
+	vec3 direction;
+	bool visible;
+};
+struct ReflectedLight {
+	vec3 directDiffuse;
+	vec3 directSpecular;
+	vec3 indirectDiffuse;
+	vec3 indirectSpecular;
+};
+struct GeometricContext {
+	vec3 position;
+	vec3 normal;
+	vec3 viewDir;
+};
+vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
+	return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );
+}
+vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {
+	return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );
+}
+vec3 projectOnPlane(in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {
+	float distance = dot( planeNormal, point - pointOnPlane );
+	return - distance * planeNormal + point;
+}
+float sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {
+	return sign( dot( point - pointOnPlane, planeNormal ) );
+}
+vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {
+	return lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;
+}
+// FOGPARS
+#ifdef USE_FOG
+	uniform vec3 fogColor;
+	#ifdef FOG_EXP2
+		uniform float fogDensity;
+	#else
+		uniform float fogNear;
+		uniform float fogFar;
+	#endif
+#endif
+
+			void main( void ) {
+
+				vec2 position = -1.0 + 2.0 * vUv;
+        float o = 0.1;
+        vec3 basecolor = vec3(22.0, 13.0, 14.0);
+        float red;
+        float green;
+        float blue;
+        float alpha = 1.0;
+
+        if ( y > waterLevel + o) {
+          red   = 0.0; //y/2.0;
+          green = y / 100.0;
+          blue  = 1.0;
+        } else if ( y > waterLevel - o && y <= waterLevel + o) {
+          red   = 255.0;
+          green = 255.0;
+          blue  = 250.0;
+        } else {
+          red   = 0.0;
+          green = 0.0;
+          blue  = 0.0;
+          alpha = 0.0;
+        }
+        gl_FragColor = vec4( red, green, blue, 1.0) * alpha;
+
+// FOG
+#ifdef USE_FOG
+	#ifdef USE_LOGDEPTHBUF_EXT
+		float depth = gl_FragDepthEXT / gl_FragCoord.w;
+	#else
+		float depth = gl_FragCoord.z / gl_FragCoord.w;
+	#endif
+	#ifdef FOG_EXP2
+		float fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * depth * depth * LOG2 ) );
+	#else
+		float fogFactor = smoothstep( fogNear, fogFar, depth );
+	#endif
+	gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+#endif
+
+        // gl_FragColor = vec4( red, green, blue, 1.0 );
+			}
+
+		</script>
+
+
+    <script id="bird-fragmentShader" type="x-shader/x-fragment">
+
+			uniform float time;
+			uniform vec2 resolution;
+
+			varying vec2 vUv;
+      varying float x;
+      varying float y;
+
+			void main( void ) {
+
+				vec2 position = -1.0 + 2.0 * vUv;
+
+        // float red   = abs( sin( x * y + time * 0.3 ) );
+        // float green = abs( sin( x * y + time * 1.0 ) );
+        // float blue  = abs( sin( x * y + time * 1.5 ) );
+        // gl_FragColor = vec4( red, green, blue, 0.5 );
+
+        float color = 0.0;
+				color += sin( x * cos( time / 15.0 ) * 80.0 ) + cos( y * cos( time / 15.0 ) * 10.0 );
+				color += sin( y * sin( time / 10.0 ) * 40.0 ) + cos( x * sin( time / 25.0 ) * 40.0 );
+				color += sin( x * sin( time / 5.0 ) * 10.0 ) + sin( y * sin( time / 35.0 ) * 80.0 );
+				color *= sin( time / 10.0 ) * 0.5;
+        gl_FragColor = vec4( vec3( color, color * 0.5, sin( color + time / 3.0 ) * 0.75 ), 1.0 );
+
+
+			}
+
+		</script>
+
+		<script id="default-vertexShader" type="x-shader/x-vertex">
+
+			varying vec2 vUv;
+      varying float x;
+      varying float y;
+
+			void main()
+			{
+        gl_Position = projectionMatrix *
+                modelViewMatrix *
+                vec4(position,1.0);
+        x = position.x;
+        y = position.z;
+			}
+
+		</script>
+
 
     <!-- app controllers -->
     <script src="js/app.js"></script>
@@ -70,27 +242,6 @@
         </ion-content>
       </ion-modal-view>
     </script>
-
-    <script type="x-shader/x-vertex" id="vertexShader">
-			varying vec3 vWorldPosition;
-			void main() {
-				vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
-				vWorldPosition = worldPosition.xyz;
-				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-			}
-		</script>
-
-		<script type="x-shader/x-fragment" id="fragmentShader">
-			uniform vec3 topColor;
-			uniform vec3 bottomColor;
-			uniform float offset;
-			uniform float exponent;
-			varying vec3 vWorldPosition;
-			void main() {
-				float h = normalize( vWorldPosition + offset ).y;
-				gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
-			}
-		</script>
 
   </body>
 </html>

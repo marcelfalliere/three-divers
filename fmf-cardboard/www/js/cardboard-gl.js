@@ -9,27 +9,30 @@ var scene,
     wsGamepadControls,
     clock,
     stats,
+    pointLight,
 
-    // mesh
+    // managers
+    starsManager,
+    waterManager,
     terrainManager,
-    waterMesh,
 
     // options
     isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
 
     // colors
     // fogColor = 0xeab5ef,
-    fogColor = 0x000000,
+    clearColor = 0x1E1E43,
+    fogColor = 0x462666,
+    // fogColor = 0x000000,
     skyColor = 0xeab5ef,
     terrainColor = 0x3E8F22,
-    waterColor = 0x88BDCF,
+    waterColor = 0xF50167,
     lightColor =  0x00ffff,
+    birdColor = 0xeab5ef,
 
     // fog
-    fogDensity = 0.0000325,
+    fogDensity = 0.004925,
 
-    // water
-    waterLevel = 0,
 
     // gui
     foo='bar';
@@ -51,38 +54,46 @@ angular.module('fmfcardboard-app')
 
     container = glFrame
 
-    init();
-    animate();
+    init(function(){
+      animate();
+    });
 
-    function init() {
+    function init(done) {
 
       // Camera
       camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
-      camera.position.x = - 20;
-      camera.position.y = 8;
-      camera.position.z = -2;
-      camera.lookAt(new THREE.Vector3(0,0,0))
-
-      // Controls
-      controls = new THREE.FirstPersonControls(camera);
-      controls.movementSpeed = 15000;
-      controls.lookSpeed = 10;
-      controls.mouseDragOn = true;
-      // Orbit controls...
-      // controls = new THREE.OrbitControls(camera);
-      // controls.target = new THREE.Vector3(0,0,0);
-      // controls.enableDamping = true;
-			// controls.dampingFactor = 0.25;
-			// controls.enableZoom = true;
 
       // Scene and Fog
       scene = new THREE.Scene();
       scene.fog = new THREE.FogExp2(fogColor, fogDensity);
 
-      // Terrain
 
-      terrainManager = new THREE.TerrainManager(camera, scene)
-      terrainManager.prepare();
+      // Renderer
+      renderer = new THREE.WebGLRenderer();
+      renderer.setClearColor(clearColor);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.innerHTML = "";
+      container.appendChild(renderer.domElement);
+
+
+      // Terrain Manager <-- Terrain Tile
+      terrainManager = new THREE.FMFTerrainManager(camera, scene)
+      terrainManager.prepare(function(){
+
+      // Controls
+      controls = new THREE.FMFControls(camera, scene, birdColor);
+      // Camera initial position // TODO : ray cast at this position and add some y's
+      controls.initAtPosition(
+        // Math.round((TILE_SIZE*GRID_SIZE)/2),
+        // terrainManager.waterLevel + 130,
+        // Math.round((TILE_SIZE*GRID_SIZE)/2)
+        1876.9658717988589,
+        58.75332999365925,
+        1714.061042652928
+      )
+
+      // Water Manager ... TODO
 
       // // Update après les rotations etc..
       // debug(yMin, yMax)
@@ -121,14 +132,9 @@ angular.module('fmfcardboard-app')
       // })
 
       // Water
-      // var geometry = new THREE.PlaneBufferGeometry(TERRAIN_SIZE,TERRAIN_SIZE)
-      // var material = new THREE.MeshPhongMaterial({
-      //   color:waterColor
-      // })
-      // waterMesh = new THREE.Mesh(geometry, material)
-      // waterMesh.rotation.x = -Math.PI / 2;
-      // waterMesh.position.y = waterLevel;
-      // scene.add(waterMesh)
+      waterManager = new THREE.FMFWaterManager(controls.bird, terrainManager.waterLevel);
+      waterManager.addToScene(scene)
+
 
       // Light
 
@@ -142,26 +148,15 @@ angular.module('fmfcardboard-app')
 			// scene.add( dirLight );
 
       // HemisphereLight
-    	hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
-    	hemiLight.color.setHSL( 0.6, 1, 0.6 );
-    	hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
-    	hemiLight.position.set( 0, 500, 0 );
-    	scene.add( hemiLight );
+    	// hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+    	// hemiLight.color.setHSL( 0.6, 1, 0.6 );
+    	// hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+    	// hemiLight.position.set( 0, 500, 0 );
+    	// scene.add( hemiLight );
 
-    	dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
-    	// dirLight.color.setHSL( 0.5, 0.5, 0.5 );
-    	dirLight.position.set( 0,10500,0 );
-    	dirLight.position.multiplyScalar( 1 );
-    	scene.add( dirLight );
-    	dirLight.castShadow = true;
-
-      // Renderer
-      renderer = new THREE.WebGLRenderer();
-      renderer.setClearColor(fogColor);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      container.innerHTML = "";
-      container.appendChild(renderer.domElement);
+      // Stars
+      starsManager = new THREE.FMFStarsManager(camera);
+      starsManager.addToScene(scene)
 
       // Stats
       stats = new Stats();
@@ -170,17 +165,45 @@ angular.module('fmfcardboard-app')
       // Clock
       clock = new THREE.Clock();
 
-      // Terrain Helpers
-      // var helper = new THREE.GridHelper( TERRAIN_SIZE / 2, TERRAIN_SEGMENTS, 0x0000ff, 0x808080 );
-			// helper.position.y = waterLevel;
-			// scene.add( helper );
-
       // Arrow Helpers
-      var axisHelper = new THREE.OriginHelper( TERRAIN_SIZE / TERRAIN_SEGMENTS );
+      var axisHelper = new THREE.FMFOriginHelper( TERRAIN_SIZE / TERRAIN_SEGMENTS );
       scene.add(axisHelper);
+
+
+      // for (var i = 0 ; i < GRID_SIZE*TILE_SIZE ; i += 100) {
+      //   for (var j = 0 ; j < GRID_SIZE*TILE_SIZE ; j += 100) {
+      //     var geo = new THREE.BoxGeometry(20, 20, 20);
+      //     var mat = new THREE.MeshLambertMaterial({color:0X333333 * Math.random() });
+      //     var mesh = new THREE.Mesh(geo, mat)
+      //     mesh.position.set(i, terrainManager.waterLevel + 20 ,j)
+      //     scene.add(mesh)
+      //   }
+      // }
+
+      // UI
+      var gui = new dat.GUI(),
+          GuiController = function(){
+              this.newPerlinData =  function(){
+                  terrainManager.deleteLocalFiles(function(code){
+                    if (code==0) {
+                      location.reload()
+                    } else {
+                      alert("Error! Check the console.")
+                    }
+                  });
+              }
+          },
+          guiController = new GuiController();
+
+			gui.add(guiController, "newPerlinData");
+
 
       // Listener
       window.addEventListener('resize', resize, false);
+
+      if (done) done()
+
+      });
 
     }
 
@@ -202,30 +225,14 @@ angular.module('fmfcardboard-app')
 
       requestAnimationFrame(animate);
 
-      // var matrix = new THREE.Matrix4().makeRotationY(-0.02);
-      // camera.applyMatrix(matrix);
-
-      // bouger dans une direction
-      // var caster = new THREE.Raycaster();
-      // this.rays = [
-      //   new THREE.Vector3(0, 0, 1),
-      //   new THREE.Vector3(1, 0, 1),
-      //   new THREE.Vector3(1, 0, 0),
-      //   new THREE.Vector3(1, 0, -1),
-      //   new THREE.Vector3(0, 0, -1),
-      //   new THREE.Vector3(-1, 0, -1),
-      //   new THREE.Vector3(-1, 0, 0),
-      //   new THREE.Vector3(-1, 0, 1)
-      // ];
-
-      // camera.updateMatrixWorld();
-
       stats.update();
 
-      controls.update(clock.getDelta());
+      controls.update(clock.getDelta(), clock.getElapsedTime());
       // wsGamepadControls.update(dt);
 
       terrainManager.update();
+      starsManager.update();
+      waterManager.update(renderer, scene);
 
       if (effect) {
         effect.render(scene, camera);
