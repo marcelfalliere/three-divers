@@ -24,32 +24,56 @@
     <li style='background-image:url("screenshots/terrain/Screen-2016-07-21.png");'>
       <a href="screenshots/terrain/Screen-2016-07-21.png" target="blank"></a>
     </li><!--
+
     --><li style='background-image:url("screenshots/terrain/Screen-2016-07-25.png");' >
       <a href="screenshots/terrain/Screen-2016-07-25.png" target="blank"></a>
     </li><!--
-    --><li style='background-image:url("screenshots/terrain/Video-2016-07-28 lq.png");'>
-      <a href="screenshots/terrain/Video-2016-07-28 lq.mov" target="_blank"></a>
+
+
+    --><li style='background-image:url("screenshots/terrain/Screen-2016-07-28.png");' >
+      <a href="screenshots/terrain/Screen-2016-07-28.png" target="blank"></a>
+    </li><!--
+
+
+    --><li class="video">
+      <video autoplay="true" controls loop>
+        <source src="screenshots/terrain/Video-2016-07-28.webm">
+      </video>
+    </li><!--
+
+
+    --><li style='background-image:url("screenshots/terrain/Screen-2016-08-08.png");' >
+      <a href="screenshots/terrain/Screen-2016-08-08.png" target="blank"></a>
+    </li><!--
+
+
+    --><li class="video">
+      <video autoplay="true" controls loop>
+        <source src="screenshots/terrain/Video-2016-08-10.webm">
+      </video>
     </li>
   </ul>
 
   <article>
     <p>
-      Features :
+      <u>Features</u> :
     <p>
     <ul>
-      <li>Three.js terrain generation with a Perlin Noise and THREE.PlaneBufferGeometry</li>
-      <li>Tiled terrain</li>
-      <li>Perlin data stored in local file</li>
+      <li>Three.js terrain generation with a Perlin Noise and THREE.PlaneBufferGeometry.</li>
+      <li>The terrain is tiled. A big heightMap is generated with Perlin Noise, and depending on player position, we add the right tiles to the scene (<a href="screenshots/terrain/Video-2016-07-28.webm">demonstrating video</a> and <a href="screenshots/terrain/Screen Shot 2016-07-28.png">an image</a>).</li>
+      <li>The heiht map is stored in a file using HTML5 FileSystem API.</li>
+      <li>Shader peregrinations : vertex (aka physical object) and fragment (aka colors)</li>
+      <li>Stars : displaying some stars, randomly, in a cone shaped centered at the camera, moving with it. At first I used a particle system, then I went with regular sprites - tried both, same perfs.</li>
+      <li>Water : a less static water ; still a wip, but the effect is not that bad. Using a texture, some random() for the waves, and 2 Planes to get a not so bad looking effect</li>
+      <li>Fiddled with controls ... nothing satisfying yet.</li>
     </ul>
     <p>
-      Roadmap :
+      <u>Next</u> :
     <p>
     <ul>
-      <li>Implémenter des controls à la dark souls mais en 3D ; challenge : que avec les touches</li>
-      <li>Voir un modèle basique d'oiseau ? D'abord un ovale, puis une tete ? puis des ailes ?</li>
-      <li>Ajouter un treeManager qui génére des points où il y a des arbres, et les génére, les sauvent, et les tiles</li>
-      <li>Ajuster les contrôles pour le mobile</li>
-      <li>Ajuster les contrôles pour la VR / webVR / store</li>
+      <li>Implement a "VegetationManager" responsible for poping stuff on the land</li>
+      <li>Implement controls. What kind ? Only keys, mouse ? Is it really necessary ? Maybe no controls is needed for this demo. Maybe the camera should find its own path.</li>
+      <li>Adjust controls to support cardboard, WebVR ; package the ionic app for the AppStore and PlayStore ?</li>
 
     </ul>
   </article>
