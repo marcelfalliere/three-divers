@@ -18,7 +18,7 @@
 </head>
 
 <body>
-  <h1>Project : <b>Terrain.</b> <a class="button" href="fmf-cardboard/www/" target="_blank">Demo</a> </h1>
+  <h1>yes man sky  <a class="button" href="fmf-cardboard/www/" target="_blank">Demo</a> </h1>
 
   <ul class="thumbs">
     <li style='background-image:url("screenshots/terrain/Screen-2016-07-21.png");'>
@@ -59,12 +59,12 @@
       <u>Features</u> :
     <p>
     <ul>
-      <li>Three.js terrain generation with a Perlin Noise and THREE.PlaneBufferGeometry.</li>
+      <li>Three.js terrain generation with a Perlin Noise and PlaneBufferGeometry.</li>
       <li>The terrain is tiled. A big heightMap is generated with Perlin Noise, and depending on player position, we add the right tiles to the scene (<a href="screenshots/terrain/Video-2016-07-28.webm">demonstrating video</a> and <a href="screenshots/terrain/Screen Shot 2016-07-28.png">an image</a>).</li>
-      <li>The heiht map is stored in a file using HTML5 FileSystem API.</li>
+      <li>The height map is stored in a file using HTML5 FileSystem API.</li>
       <li>Shader peregrinations : vertex (aka physical object) and fragment (aka colors)</li>
       <li>Stars : displaying some stars, randomly, in a cone shaped centered at the camera, moving with it. At first I used a particle system, then I went with regular sprites - tried both, same perfs.</li>
-      <li>Water : a less static water ; still a wip, but the effect is not that bad. Using a texture, some random() for the waves, and 2 Planes to get a not so bad looking effect</li>
+      <li>Water : a less static water ; still a wip, but the effect is not that bad. Using a texture, some random() for the waves, and 2 Planes to get a not so bad looking effect (<a href="screenshots/terrain/Video-2016-08-10.webm">video</a>)</li>
       <li>Fiddled with controls ... nothing satisfying yet.</li>
     </ul>
     <p>
@@ -74,6 +74,7 @@
       <li>Implement a "VegetationManager" responsible for poping stuff on the land</li>
       <li>Implement controls. What kind ? Only keys, mouse ? Is it really necessary ? Maybe no controls is needed for this demo. Maybe the camera should find its own path.</li>
       <li>Adjust controls to support cardboard, WebVR ; package the ionic app for the AppStore and PlayStore ?</li>
+      <li>Music ? Sound ?</li>
 
     </ul>
   </article>
