@@ -77,7 +77,7 @@ THREE.FMFControls = function ( camera, scene, birdColor ) {
 
 		var distanceToBird = this.camera.position.distanceTo(this.bird.position);
 
-		this.camera.translateX(speedX);
+		// this.camera.translateY(-0.01);
 		//
 		// if (this.camera.position.y <= minY) {
 		// 	directionY = 1;
@@ -107,7 +107,7 @@ THREE.FMFControls = function ( camera, scene, birdColor ) {
 		// 	consoe.log("yo")
 		// }
 
-    this.camera.lookAt( this.bird.position );
+    // this.camera.lookAt( this.bird.position );
 
   }
 

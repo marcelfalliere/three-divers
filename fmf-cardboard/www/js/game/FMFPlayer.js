@@ -39,7 +39,7 @@ THREE.FMFPlayer = function ( controls, camera, birdColor ) {
 	});
 	this.mesh = new THREE.Mesh(body_geometry, material);
 	this.position = this.mesh.position;
-
+this.mesh.visible = false;
 	// this.mesh = new THREE.Object3D();
 	// this.position = this.mesh.position;
 	//
