@@ -121,11 +121,12 @@ vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 poi
 			void main( void ) {
 
 				vec2 position = -1.0 + 2.0 * vUv;
-        float o = 1.0;
+        float o = 0.1;
         vec3 basecolor = vec3(22.0, 13.0, 14.0);
         float red;
         float green;
         float blue;
+        float alpha = 1.0;
 
         if ( y > waterLevel + o) {
           red   = 0.0; //y/2.0;
@@ -139,8 +140,9 @@ vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 poi
           red   = 0.0;
           green = 0.0;
           blue  = 0.0;
+          alpha = 0.0;
         }
-        gl_FragColor = vec4( red, green, blue, 1.0 );
+        gl_FragColor = vec4( red, green, blue, 1.0) * alpha;
 
 // FOG
 #ifdef USE_FOG
@@ -161,6 +163,7 @@ vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 poi
 			}
 
 		</script>
+
 
     <script id="bird-fragmentShader" type="x-shader/x-fragment">
 

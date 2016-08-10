@@ -12,6 +12,7 @@ THREE.FMFTerrainTile = function ( perlinData, nbTiles, size, segments, terrainCo
 			material1 = new THREE.MeshLambertMaterial({color : terrainColor, wireframe:on_debug }),
 			material2 = new THREE.ShaderMaterial({
 									 fog:true,
+									 transparent:true,
 										uniforms: THREE.UniformsUtils.merge([
 												THREE.UniformsLib[ "fog" ], {
 													waterLevel: { value : waterLevel }
@@ -49,8 +50,8 @@ THREE.FMFTerrainTile = function ( perlinData, nbTiles, size, segments, terrainCo
 	this.position.x = size * position.y + size/2;
 
 	for ( var i = 0, j = 2 ; i < vertices.length ; i ++, j += 3  ) {
-		if (vertices[j] + 5 <= waterLevel) {
-	  	vertices[j] = waterLevel - 5;
+		if (vertices[j] + 1 <= waterLevel) {
+	  	vertices[j] = waterLevel - 1;
 	 	}
 	}
 

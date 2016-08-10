@@ -26,12 +26,12 @@ var scene,
     // fogColor = 0x000000,
     skyColor = 0xeab5ef,
     terrainColor = 0x3E8F22,
-    waterColor = 0xF58B67,
+    waterColor = 0xF50167,
     lightColor =  0x00ffff,
     birdColor = 0xeab5ef,
 
     // fog
-    fogDensity = 0.000925,
+    fogDensity = 0.004925,
 
 
     // gui
@@ -66,6 +66,15 @@ angular.module('fmfcardboard-app')
       // Scene and Fog
       scene = new THREE.Scene();
       scene.fog = new THREE.FogExp2(fogColor, fogDensity);
+
+
+      // Renderer
+      renderer = new THREE.WebGLRenderer();
+      renderer.setClearColor(clearColor);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.innerHTML = "";
+      container.appendChild(renderer.domElement);
 
 
       // Terrain Manager <-- Terrain Tile
@@ -149,14 +158,6 @@ angular.module('fmfcardboard-app')
       starsManager = new THREE.FMFStarsManager(camera);
       starsManager.addToScene(scene)
 
-      // Renderer
-      renderer = new THREE.WebGLRenderer();
-      renderer.setClearColor(clearColor);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      container.innerHTML = "";
-      container.appendChild(renderer.domElement);
-
       // Stats
       stats = new Stats();
       container.appendChild(stats.dom);
@@ -167,6 +168,17 @@ angular.module('fmfcardboard-app')
       // Arrow Helpers
       var axisHelper = new THREE.FMFOriginHelper( TERRAIN_SIZE / TERRAIN_SEGMENTS );
       scene.add(axisHelper);
+
+
+      // for (var i = 0 ; i < GRID_SIZE*TILE_SIZE ; i += 100) {
+      //   for (var j = 0 ; j < GRID_SIZE*TILE_SIZE ; j += 100) {
+      //     var geo = new THREE.BoxGeometry(20, 20, 20);
+      //     var mat = new THREE.MeshLambertMaterial({color:0X333333 * Math.random() });
+      //     var mesh = new THREE.Mesh(geo, mat)
+      //     mesh.position.set(i, terrainManager.waterLevel + 20 ,j)
+      //     scene.add(mesh)
+      //   }
+      // }
 
       // UI
       var gui = new dat.GUI(),
@@ -220,7 +232,7 @@ angular.module('fmfcardboard-app')
 
       terrainManager.update();
       starsManager.update();
-      waterManager.update();
+      waterManager.update(renderer, scene);
 
       if (effect) {
         effect.render(scene, camera);

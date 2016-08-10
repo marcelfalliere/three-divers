@@ -66,9 +66,9 @@ THREE.FMFControls = function ( camera, scene, birdColor ) {
 	// Camera position update
 	var speedX = .5,
 			speedY = 0.1,
-			maxY = 200,
-			minY = this.camera.position.y + 5,
-			directionY = 1;
+			maxY = 80,
+			minY = 20,
+			directionY = -1;
 
   this.update = function(delta, elapsedSeconds) {
 
@@ -78,15 +78,15 @@ THREE.FMFControls = function ( camera, scene, birdColor ) {
 		var distanceToBird = this.camera.position.distanceTo(this.bird.position);
 
 		this.camera.translateX(speedX);
+		//
+		// if (this.camera.position.y <= minY) {
+		// 	directionY = 1;
+		// } else if (this.camera.position.y >= maxY) {
+		// 	directionY = -1;
+		// }
 
-		if (this.camera.position.y <= minY) {
-			directionY = 1;
-		} else if (this.camera.position.y >= maxY) {
-			directionY = -1;
-		}
-
-		this.camera.translateY(speedY * directionY);
-		this.bird.mesh.translateY(speedY * directionY);
+		// this.camera.translateY(speedY * directionY);
+		// this.bird.mesh.translateY(speedY * directionY);
 
 		//
 		// if (toBack && distanceToBird <= this.bird.mesh.geometry.parameters.radius + 20) {
